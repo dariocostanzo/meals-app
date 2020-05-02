@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+
 import MealList from '../components/MealList';
+import HeaderButton from '../components/HeaderButton';
 import { MEALS } from '../data/dummy-data';
 
 const FavoritesScreen = props => {
@@ -8,8 +10,22 @@ const FavoritesScreen = props => {
   return <MealList listData={favMeals} navigation={props.navigation} />;
 };
 
-FavoritesScreen.navigationOptions = {
-  headerTitle: 'Your Favourites'
+FavoritesScreen.navigationOptions = navData => {
+  return {
+    headerTitle: 'Your Favourite',
+    headerLeft: () => (
+      //burger button
+      <HeaderButtons HeaderButtonComponent={HeaderButton}>
+        <Item
+          title='Menu'
+          iconName='ios-menu'
+          onPress={() => {
+            navData.navigation.toggleDrawer();
+          }}
+        ></Item>
+      </HeaderButtons>
+    )
+  };
 };
 
 export default FavoritesScreen;
