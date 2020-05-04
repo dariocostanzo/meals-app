@@ -2,12 +2,13 @@ import React from 'react';
 // Import `useSelector` to select a slice of our globally managed state and use it in this component
 // using the hook will allow us to use in a functional component
 // Another approach by importing the `connect` function and wrap the export with that
-
 import { useSelector } from 'react-redux';
 // Remove MEALS and replaced with data from the store
 // import { CATEGORIES, MEALS } from '../data/dummy-data';
 import { CATEGORIES } from '../data/dummy-data';
 import MealList from '../components/MealList';
+import { View, StyleSheet } from 'react-native';
+import DefaultText from '../components/DefaultText';
 
 const CategoryMealsScreen = props => {
   const catId = props.navigation.getParam('categoryId'); //get params send from CategoriesScreen.js
@@ -38,6 +39,14 @@ const store = createStore(rootReducer); (i)
     meal => meal.categoryIds.indexOf(catId) >= 0
   );
 
+  if (displayedMeals.length === 0) {
+    return (
+      <View style={styles.content}>
+        <DefaultText>No meals found, maybe check your filters.</DefaultText>
+      </View>
+    );
+  }
+
   return <MealList listData={displayedMeals} navigation={props.navigation} />;
 };
 // using navigationOption as a function for dynamic content
@@ -53,5 +62,11 @@ CategoryMealsScreen.navigationOptions = navigationData => {
     headerTitle: selectedCategory.title
   };
 };
-
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+});
 export default CategoryMealsScreen;
