@@ -2,6 +2,7 @@
  and that will be toggle favorites.
  */
 export const TOGGLE_FAVORITE = 'TOGGLE_FAVORITE';
+export const SET_FILTERS = 'SET_FILTERS';
 
 /*  Export a function that creates me an action, because an action is not just an identifier, also
 needs some extra payload and we actually have an action which is an object with identifier and payload.
@@ -13,4 +14,8 @@ After creating the action we need to update the reducer to act when I get toggle
 
 export const toggleFavorite = id => {
   return { type: TOGGLE_FAVORITE, mealId: id };
+};
+
+export const setFilters = filterSettings => {
+  return { type: SET_FILTERS, filters: filterSettings };
 };

@@ -13,7 +13,7 @@ if we need to act and what we need to do.
 
 // 4. Import dummy data
 import { MEALS } from '../../data/dummy-data';
-import { TOGGLE_FAVORITE } from '../actions/meals';
+import { TOGGLE_FAVORITE, SET_FILTERS } from '../actions/meals';
 
 // 2. When we first execute our app, we also want to set up an initial state which is used initially, so
 // which initializes our state when this app launches. It holds a simple js object.
@@ -47,6 +47,24 @@ const mealsReducer = (state = initialState, action) => {
         const meal = state.meals.find(meal => meal.id === action.mealId);
         return { ...state, favoriteMeals: state.favoriteMeals.concat(meal) };
       }
+    case SET_FILTERS:
+      const appliedFilters = actions.filters;
+      const filteredMeals = state.meals.filter(meal => {
+        if (appliedFilters.glutenFree && !meal.isGlutenFree) {
+          return false;
+        }
+        if (appliedFilters.lactoseFree && !meal.isLactoseFree) {
+          return false;
+        }
+        if (appliedFilters.vegetarian && !meal.isVegetarian) {
+          return false;
+        }
+        if (appliedFilters.vegan && !meal.isVegan) {
+          return false;
+        }
+        return true;
+      });
+      return { ...state, filteredMeals };
     default:
       return state;
   }
