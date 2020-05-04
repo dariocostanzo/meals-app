@@ -1,12 +1,40 @@
 import React from 'react';
+// Import `useSelector` to select a slice of our globally managed state and use it in this component
+// using the hook will allow us to use in a functional component
+// Another approach by importing the `connect` function and wrap the export with that
 
-import { CATEGORIES, MEALS } from '../data/dummy-data';
+import { useSelector } from 'react-redux';
+// Remove MEALS and replaced with data from the store
+// import { CATEGORIES, MEALS } from '../data/dummy-data';
+import { CATEGORIES } from '../data/dummy-data';
 import MealList from '../components/MealList';
 
 const CategoryMealsScreen = props => {
   const catId = props.navigation.getParam('categoryId'); //get params send from CategoriesScreen.js
+  // You can use MEALS with the help  of useSelector, to derive our displayedMeals, I will create a new const
+  // and useSelector() will retrieve me data out of the state and return it.
+  // useSelector takes a function that will be executed for us by React Redux.
+  // This function will get the state as an argument, and it then is able to return any data we want
+  // from that globale store, from the global state
+  /* How to retrieve data from the state? (state => state) on the right state is automatically returned 
+To get access to something from the state we need to go back to the place where we create the store(i),
+there I pass in a rootReducer which is created by combining all reducers(ii). There we have the `meals` key which 
+gives us the slice of our state which is managed by this reducer `mealsReducer` and identifier.
+We can now use this identifier (meals) to get hold of that part of our state (mealsReducer), for which this reducer
+is responsible.
+So in the and, a state that will look like this `initialState` (from meals.js).
 
-  const displayedMeals = MEALS.filter(
+  const rootReducer = combineReducers({ (ii)
+  meals: mealsReducer
+});
+
+const store = createStore(rootReducer); (i)
+  */
+  const availableMeals = useSelector(state => state.meals.filteredMeals);
+
+  // replace MEALS.filter with availableMeals.filter
+  // const displayedMeals = MEALS.filter(
+  const displayedMeals = availableMeals.filter(
     meal => meal.categoryIds.indexOf(catId) >= 0
   );
 

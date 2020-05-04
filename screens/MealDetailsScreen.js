@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ScrollView, View, Image, Text, StyleSheet } from 'react-native';
 
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-
-import { MEALS } from '../data/dummy-data';
+import { useSelector, useDispatch } from 'react-redux';
+// import { MEALS } from '../data/dummy-data';
 import HeaderButton from '../components/HeaderButton';
 import DefaultText from '../components/DefaultText';
-
+import { toggleFavorite } from '../store/actions/meals';
 const ListItem = props => {
   return (
     <View style={styles.listItem}>
@@ -16,9 +16,36 @@ const ListItem = props => {
 };
 
 const MealDetailsScreen = props => {
+  const availableMeals = useSelector(state => state.meals.meals);
   const mealId = props.navigation.getParam('mealId');
 
-  const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  // const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  const selectedMeal = availableMeals.find(meal => meal.id === mealId);
+  // setParams to forward the select title to the header and will be merged with the existing params,
+  // so this will not override mealId
+  // 1) This means I send this params to my header when this component renders in the end, it will change props
+  // and to avoid ending up in the infinite loop we use it inside useEffect, when selectedMeals change I want
+  // to forward my info to the header, but it send the params to the tilt when this transition is till playing
+  // and the rendering hasn't finished, so the title is not showing immediately.
+  // 2) A better soluytion, would be to simply forward the title which will need here from inside the component
+  // you are coming from, so that you load it when you are in the component that will go to this component and you
+  // send it to this component before it is loaded.
+  // Solution n.1
+  // useEffect(() => {
+  //   props.navigation.setParams({ mealTitle: selectedMeal.title });
+  // }, [selectedMeal]);
+  // Soluition 2.
+  // setting the data we need on the component where we trigger that navigation action to the mealDetail (MealList.js)
+
+  const dispatch = useDispatch();
+  const toggleFavoriteHandler = useCallback(() => {
+    dispatch(toggleFavorite(mealId));
+  }, [dispatch, mealId]);
+
+  useEffect(() => {
+    // props.navigation.setParams({ mealTitle: selectedMeal.title });
+    props.navigation.setParams({ toggleFav: toggleFavoriteHandler });
+  }, [toggleFavoriteHandler]);
 
   return (
     <ScrollView>
@@ -42,18 +69,20 @@ const MealDetailsScreen = props => {
 };
 
 MealDetailsScreen.navigationOptions = navigationData => {
-  const mealId = navigationData.navigation.getParam('mealId');
-  const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  // const mealId = navigationData.navigation.getParam('mealId');
+  /* we can't use useSelector here, the solution is to use Params inside MealDetailsScreen*/
+  const mealTitle = navigationData.navigation.getParam('mealTitle');
+  // const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  const toggleFavorite = navigationData.navigation.getParam('toggleFav');
   return {
-    headerTitle: selectedMeal.title,
+    // headerTitle: selectedMeal.title,
+    headerTitle: mealTitle,
     headerRight: () => (
       <HeaderButtons HeaderButtonComponent={HeaderButton}>
         <Item
           title='Favorite'
           iconName='ios-star-outline'
-          onPress={() => {
-            console.log('Mark as favorite!');
-          }}
+          onPress={toggleFavorite}
         />
       </HeaderButtons>
     )

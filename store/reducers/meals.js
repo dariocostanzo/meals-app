@@ -13,6 +13,7 @@ if we need to act and what we need to do.
 
 // 4. Import dummy data
 import { MEALS } from '../../data/dummy-data';
+import { TOGGLE_FAVORITE } from '../actions/meals';
 
 // 2. When we first execute our app, we also want to set up an initial state which is used initially, so
 // which initializes our state when this app launches. It holds a simple js object.
@@ -33,6 +34,23 @@ const initialState = {
 // initial state, because when Redux gets started and starts up, there will be one initial action dispatched, which is used
 // to run through the reducer once and that will then load our initial state.
 const mealsReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case TOGGLE_FAVORITE:
+      const existingIndex = state.favoriteMeals.findIndex(
+        meal => (meal.id = action.mealId)
+      );
+      if (existingIndex >= 0) {
+        const updatedFavMeals = [...state.favoriteMeals];
+        updatedFavMeals.splice(existingIndex, 1);
+        return { ...state, favoriteMeals: updatedFavMeals };
+      } else {
+        const meal = state.meals.find(meal => meal.id === action.mealId);
+        return { ...state, favoriteMeals: state.favoriteMeals.concat(meal) };
+      }
+    default:
+      return state;
+  }
+
   // 1. In this function you need to return a new state
   return state;
 };
@@ -52,9 +70,10 @@ const rootReducer = combineReducers({
 
 Merges mealsReducer into this rootReducer and will later be able to work with the state managed by the meals reducer
 so with `initialState`, with the help of this `meals` property, will be able to access this state.
-We just need to pass `rootReducer` to createStore const store = createStore(rootReducer); which gives us a store
-and which need to be provided to our application and for that we need that other package Provider from react-redux
-import { Provider } from 'react-redux';
+We just need to pass `rootReducer` to createStore 
+`const store = createStore(rootReducer);`
+which gives us a store and which need to be provided to our application
+ and for that we need that other package Provider from react-redux `import { Provider } from 'react-redux';`
 We then wrap provider around our root app component in the end ( MealsNavigator )
 
   return (
@@ -62,9 +81,11 @@ We then wrap provider around our root app component in the end ( MealsNavigator 
       <MealsNavigator />
     </Provider>
   );
-  
+
 Provider takes the store prop and as a value we pass our store.
 
 */
+
+// 8. Import MEALS in the file where we are importing MEALS from dummy-data (i.e CategoryMealsScreen)
 
 export default mealsReducer;
